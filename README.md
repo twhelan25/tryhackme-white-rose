@@ -99,4 +99,38 @@ As a test, I added a 0 to the end of password-password0 and click send. In the r
 
 ![intercept2](https://github.com/user-attachments/assets/26e4f783-d04f-492b-85b1-8df8a9898632)
 
+Here's a brief explaination:
+
+![gpt](https://github.com/user-attachments/assets/c6e09053-7926-4e51-87ee-ef252c4f10f6)
+
+I then did a google search of "ejs ssti payloads" and here's the site I used to base my payload off of: https://eslam.io/posts/ejs-server-side-template-injection-rce/
+
+The first payload that I used is:
+``` bash
+&settings[view options][outputFunctionName]=x;return global.process.mainModule.require('child_process').execSync('id');//
+```
+And here is the response:
+
+![payload1](https://github.com/user-attachments/assets/995b96f5-08e6-43ea-a756-d74b69b4503f)
+
+Then I changed to get /etc/passwd:
+
+![passwd](https://github.com/user-attachments/assets/a7ae1d45-df60-4ab5-a670-c02114230a5a)
+
+Now, let's get RCE with a reverse shell. I used nc mkfifo with url encoded:
+
+![shell](https://github.com/user-attachments/assets/1f1ab7de-a9dd-4199-a1b7-87b8ba0f403e)
+
+![web](https://github.com/user-attachments/assets/2baad4ae-5458-4602-8609-9a8ebad924b4)
+
+And now we can grab user.txt:
+
+![user txt](https://github.com/user-attachments/assets/b4838ffa-4879-4f59-9add-302aa0a62db4)
+
+And sudo -l reveals that we can run sudoedit with this path and I checked the sudoedit version:
+
+![sudo -l](https://github.com/user-attachments/assets/effdb339-77ed-4c15-9875-e30735104510)
+
+
+
 
