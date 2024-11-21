@@ -41,4 +41,62 @@ Output in Normal Format: This option saves the scan results in a plain text file
 
 The scan reveals two open port, ssh and a web server on port 80. Let's check out the web sever.
 
+When I tried to navigate to the ip, the url changed form the ip to cyprusbank.thm and the browser displayed site cannot be reached. After adding cyprusbank.thm to our /etc/hosts file, the site is displayed:
+
+![hosts](https://github.com/user-attachments/assets/0e8f9346-30a4-49c4-ab3d-20d925bda498)
+
+This site loads this message about maintainence:
+
+![national_bank](https://github.com/user-attachments/assets/492324cc-41a3-4b72-8f05-e09051a08ce6)
+
+I also ran a gobuster and nikto scan on the target but it didn't turn up anything so I ran a scan for sub domains with ffuf:
+
+![ffuf](https://github.com/user-attachments/assets/a0bff6f0-c01b-426d-a5fd-ccfa61abebb6)
+
+This reveals an admin sub domain.
+
+We will repeat the same process of adding this to our /etc/hosts:
+
+![hosts2](https://github.com/user-attachments/assets/178466b4-3c6f-44b2-9290-8926e9d6c14c)
+
+This brings us to an admin login panel and we'll use Olivia's creds that were provided in the ctf introduction:
+
+![cortez_admin](https://github.com/user-attachments/assets/886b2892-b2c1-4ff2-ba4b-82dce9648b2c)
+
+Once logged in the home page displays a list banking information for different bank customers, including Tyrell. However, the phone numbers are not yet shwon, so we can't answer the first question yet. 
+
+When navigating to messages we see a chat box that displays some previous messages, which Olivia can add to.
+
+![messages1](https://github.com/user-attachments/assets/f17fceb5-5902-4fb0-82e2-54326f87b592)
+
+After examining the url, we see the ?c=5. I tested this for an IDOR vulnerability and by changing the 5 to 0:
+
+This reveals previous messages, including one where admin Gayle Bev shares her credentails!
+
+![gale creds](https://github.com/user-attachments/assets/6f54571b-855c-4b13-bb6c-6bbfb1ce34f4)
+
+We'll log out of Olivia's account and back into Gayles:
+
+![gayle_login](https://github.com/user-attachments/assets/b8f3b491-25d2-4585-9524-6082a18eae79)
+
+And now we can see Tyrell's number.
+
+![tyrell](https://github.com/user-attachments/assets/8d515b4e-798c-4b8e-94c8-f7ad3caec65e)
+
+We can also access the settings menus for the site. I updated Tyrell's password to password:
+
+![settings](https://github.com/user-attachments/assets/2f4a61ca-e72d-4faa-b1d3-1509b0d699aa)
+
+The import thing to notice here is the password change is fully displayed on the site which suggests that the site is vulnerable to SSTI.
+
+We will update the password again and capture the request in burp suite.
+
+Once we have incepted the request, we'll sent it to repeater:
+
+![intercept](https://github.com/user-attachments/assets/ebc78c75-e6d1-4215-86cd-d2462392d58b)
+
+As a test, I added a 0 to the end of password-password0 and click send. In the response we see an error "settings.ejs". 
+
+![intercept2](https://github.com/user-attachments/assets/26e4f783-d04f-492b-85b1-8df8a9898632)
+
 
