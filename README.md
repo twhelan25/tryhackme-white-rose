@@ -131,6 +131,10 @@ And sudo -l reveals that we can run sudoedit with this path and I checked the su
 
 ![sudo -l](https://github.com/user-attachments/assets/effdb339-77ed-4c15-9875-e30735104510)
 
+I did a google search and found this exploit:
+
+![exploitdb](https://github.com/user-attachments/assets/6d688218-e4a8-40e8-ae09-2178d125c980)
+
 
 
 
