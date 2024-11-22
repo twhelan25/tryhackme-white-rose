@@ -1,5 +1,7 @@
 ![intro](https://github.com/user-attachments/assets/ea44f140-2536-41c9-966b-07d1befd83bd)
 ![intro 2](https://github.com/user-attachments/assets/8a38ad71-ae4f-438d-a15d-559edd19ef4a)
+![whiterose](https://github.com/user-attachments/assets/d5eef3a4-daea-41fd-a9f6-301fa64e6e6b)
+
 
 # tryhackme-white-rose
 
