@@ -127,6 +127,8 @@ And now we can grab user.txt from the user web's home directory.
 
 ![user txt](https://github.com/user-attachments/assets/b4838ffa-4879-4f59-9add-302aa0a62db4)
 
+## Exploit
+
 And sudo -l reveals that we can run sudoedit with this path and I checked the sudoedit version:
 
 ![sudo -l](https://github.com/user-attachments/assets/effdb339-77ed-4c15-9875-e30735104510)
@@ -135,7 +137,21 @@ I did a google search and found this exploit:
 
 ![exploitdb](https://github.com/user-attachments/assets/6d688218-e4a8-40e8-ae09-2178d125c980)
 
+So the first step of exploited this is to exploit is to set the EDITOR variable to write to a critical file that only root should have access to. I am going to use this to write to the /etc/sudoers file and give our user web, complete privileges.
+This screen shot domontrates the first step:
 
+![exploit](https://github.com/user-attachments/assets/fe03c801-a158-4128-98a2-199767d245ff)
+
+Once you execute the second command, vim /etc/sudoers will open for editing. For me on this target, vim was very glitchy and hard to navigate, but I just slowly scrolled down the /etc/sudoers file until I saw the line "root ALL=(ALL:ALL) ALL". Below this line, I will add this line to grant user web full privileges:
+``` bash
+web ALL=NOPASSWD: ALL
+```
+Then write and quite :wq. 
+Now, all we have to do to become root is sudo su, as deomonstrated in this screen shot:
+
+![root txt](https://github.com/user-attachments/assets/c8c39ff4-b112-4212-a299-ada74db194c6)
+
+I hope you enjoyed this CTF!
 
 
 
