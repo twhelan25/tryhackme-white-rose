@@ -41,7 +41,7 @@ Output in Normal Format: This option saves the scan results in a plain text file
 
 The scan reveals two open port, ssh and a web server on port 80. Let's check out the web sever.
 
-When I tried to navigate to the ip, the url changed form the ip to cyprusbank.thm and the browser displayed site cannot be reached. After adding cyprusbank.thm to our /etc/hosts file, the site is displayed:
+When I tried to navigate to the ip, the url changed form the ip to cyprusbank.thm and the browser displayed "site cannot be reached". After adding cyprusbank.thm to our /etc/hosts file, the site is displayed:
 
 ![hosts](https://github.com/user-attachments/assets/0e8f9346-30a4-49c4-ab3d-20d925bda498)
 
@@ -49,13 +49,13 @@ This site loads this message about maintainence:
 
 ![national_bank](https://github.com/user-attachments/assets/492324cc-41a3-4b72-8f05-e09051a08ce6)
 
-I also ran a gobuster and nikto scan on the target but it didn't turn up anything so I ran a scan for sub domains with ffuf:
+I also ran a gobuster and nikto scan on the target but it didn't turn up anything, so I ran a scan for sub domains with ffuf:
 
 ![ffuf](https://github.com/user-attachments/assets/a0bff6f0-c01b-426d-a5fd-ccfa61abebb6)
 
 This reveals an admin sub domain.
 
-We will repeat the same process of adding this to our /etc/hosts:
+We will repeat the same process of adding this to our /etc/hosts file:
 
 ![hosts2](https://github.com/user-attachments/assets/178466b4-3c6f-44b2-9290-8926e9d6c14c)
 
@@ -63,13 +63,13 @@ This brings us to an admin login panel and we'll use Olivia's creds that were pr
 
 ![cortez_admin](https://github.com/user-attachments/assets/886b2892-b2c1-4ff2-ba4b-82dce9648b2c)
 
-Once logged in the home page displays a list banking information for different bank customers, including Tyrell. However, the phone numbers are not yet shwon, so we can't answer the first question yet. 
+Once logged in, the home page displays a list banking information for different cyprusbank customers, including Tyrell. However, the phone numbers are not yet shwon, so we can't answer the first question yet. 
 
-When navigating to messages we see a chat box that displays some previous messages, which Olivia can add to.
+When navigating to messages we see a chat box that displays some previous messages, which Olivia can add to:
 
 ![messages1](https://github.com/user-attachments/assets/f17fceb5-5902-4fb0-82e2-54326f87b592)
 
-After examining the url, we see the ?c=5. I tested this for an IDOR vulnerability and by changing the 5 to 0:
+After examining the url, we see the ?c=5. I tested this for an IDOR (Insecure Direct Object References) vulnerability, and  change the 5 to 0. 
 
 This reveals previous messages, including one where admin Gayle Bev shares her credentails!
 
@@ -79,7 +79,7 @@ We'll log out of Olivia's account and back into Gayles:
 
 ![gayle_login](https://github.com/user-attachments/assets/b8f3b491-25d2-4585-9524-6082a18eae79)
 
-And now we can see Tyrell's number.
+And now we can see Tyrell's number!
 
 ![tyrell](https://github.com/user-attachments/assets/8d515b4e-798c-4b8e-94c8-f7ad3caec65e)
 
@@ -87,7 +87,7 @@ We can also access the settings menus for the site. I updated Tyrell's password 
 
 ![settings](https://github.com/user-attachments/assets/2f4a61ca-e72d-4faa-b1d3-1509b0d699aa)
 
-The import thing to notice here is the password change is fully displayed on the site which suggests that the site is vulnerable to SSTI.
+The import thing to notice here is the password change is fully displayed on the site which suggests that the site is vulnerable to SSTI(Server Side Template Injection). SSRI can be used for LFI(Local File Inclusion) and RCE(Remote Code Execution).
 
 We will update the password again and capture the request in burp suite.
 
@@ -95,11 +95,11 @@ Once we have incepted the request, we'll sent it to repeater:
 
 ![intercept](https://github.com/user-attachments/assets/ebc78c75-e6d1-4215-86cd-d2462392d58b)
 
-As a test, I added a 0 to the end of password-password0 and click send. In the response we see an error "settings.ejs". 
+As a test, I added a 0 to the end of password(password0) and click send. In the response we see an error "settings.ejs". 
 
 ![intercept2](https://github.com/user-attachments/assets/26e4f783-d04f-492b-85b1-8df8a9898632)
 
-Here's a brief explaination:
+Here's a brief explaination from chatgpt:
 
 ![gpt](https://github.com/user-attachments/assets/c6e09053-7926-4e51-87ee-ef252c4f10f6)
 
@@ -107,23 +107,23 @@ I then did a google search of "ejs ssti payloads" and here's the site I used to 
 
 The first payload that I used is:
 ``` bash
-&settings[view options][outputFunctionName]=x;return global.process.mainModule.require('child_process').execSync('id');//
+&settings[view options][outputFunctionName]=x;return global.process.mainModule.require('child_process').execSync('whoami');//
 ```
 And here is the response:
 
 ![payload1](https://github.com/user-attachments/assets/995b96f5-08e6-43ea-a756-d74b69b4503f)
 
-Then I changed to get /etc/passwd:
+Then I changed it to get /etc/passwd:
 
 ![passwd](https://github.com/user-attachments/assets/a7ae1d45-df60-4ab5-a670-c02114230a5a)
 
-Now, let's get RCE with a reverse shell. I used nc mkfifo with url encoded:
+Now, let's get RCE with a reverse shell. I went to revshells.com and used nc mkfifo with url encoded:
 
 ![shell](https://github.com/user-attachments/assets/1f1ab7de-a9dd-4199-a1b7-87b8ba0f403e)
 
 ![web](https://github.com/user-attachments/assets/2baad4ae-5458-4602-8609-9a8ebad924b4)
 
-And now we can grab user.txt:
+And now we can grab user.txt from the user web's home directory. 
 
 ![user txt](https://github.com/user-attachments/assets/b4838ffa-4879-4f59-9add-302aa0a62db4)
 
@@ -134,6 +134,8 @@ And sudo -l reveals that we can run sudoedit with this path and I checked the su
 I did a google search and found this exploit:
 
 ![exploitdb](https://github.com/user-attachments/assets/6d688218-e4a8-40e8-ae09-2178d125c980)
+
+
 
 
 
